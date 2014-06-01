@@ -1,7 +1,7 @@
 //   Queue - an implementation of a single producer multiple consumers 
 //           with the following constraints:
-//           - the consumers can register/deregister to the queue at run time
-//           - all the messages MUST be consumed by all the consumers
+//           - the consumers can subscribe/unsubscribe to the queue at run time
+//           - all the messages MUST be consumed by all the subscribed consumers
 //            
 //   Copyright (C) 2014 Monica Reggiani <monica.reggiani@gmail.com>
 // 
@@ -32,39 +32,42 @@ template <typename T>
 class Queue {
   public:
     
-    T pop();
-    void push(const T& item);
-  
+    Queue() = default;
+    Queue(const Queue&) = delete;   
+    Queue& operator=(const Queue&) = delete; 
+    
     void subscribe(); 
     void unsubscribe();
     
-    Queue() = default;
-    Queue(const Queue&) = delete;            // disable copying
-    Queue& operator=(const Queue&) = delete; // disable assignment
+    T pop();
+    void push(const T& item);
    
     template <typename B>
     friend std::ostream& operator<< (std::ostream& os,  Queue<B>& queue);
   
   private:
     
-    //:TODO: move to deque if you go with a circular list (list has time 1 of access.. deque is more like a vector!!
-    // BUT WATCH OUT... NEVER EVER USE something that can be reallocated... otherwise bye bye to the iterator and pointers
+    // decided to go with a list so we can trust the iterator. With other containers you can have
+    // reallocation that invalidates iterator
     std::list<T> queue_;
     typedef typename std::list<T>::iterator QueueIterator; 
+    
+    // could be a single map with a structure. But keep in this way cause it helps in function unsubscribe
     std::map< std::thread::id, QueueIterator > subscribersNextRead_; 
     std::map< std::thread::id, int > subscribersMissingRead_;
+ 
     std::mutex mutex_;
     std::condition_variable cond_;
     
+    // utility function used to find the maximum on a map
+    static bool pred(const std::pair< std::thread::id, int>& lhs, const std::pair< std::thread::id, int>& rhs);
     bool someoneSlowerThanMe();
 };
 
 #include "Queue.cpp"
 
-#endif
-     //movable semantic  bool push (T &&item /*, ...*/)).
+#endif 
 
-    // is it possible to use emplace?
 
   
     

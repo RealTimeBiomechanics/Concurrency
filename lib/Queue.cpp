@@ -1,7 +1,7 @@
 //   Queue - an implementation of a single producer multiple consumers 
 //           with the following constraints:
-//           - the consumers can register/deregister to the queue at run time
-//           - all the messages MUST be consumed by all the consumers
+//           - the consumers can subscribe/unsubscribe to the queue at run time
+//           - all the messages MUST be consumed by all the subscribed consumers
 //            
 //   Copyright (C) 2014 Monica Reggiani <monica.reggiani@gmail.com>
 // 
@@ -40,39 +40,32 @@
     if (!someoneSlowerThanMe()) { 
       queue_.pop_front();  
     }
+    
     mlock.unlock();
     return val;
     
   }
     
-  // push data only when the queue has subscribers
-  // do not have to wait... the list gonna increase
+  // push data only when the queue has subscribers 
   template <typename T>  
   void Queue<T>::push(const T& item) {
     
-    // push the data
     std::unique_lock<std::mutex> mlock(mutex_);
     if (!subscribersNextRead_.empty()) 
       queue_.push_back(item);
-    
 
-   
-    
-    
     // if you had nothing to read...now you have something
     for (auto& it : subscribersNextRead_) {
       if (subscribersMissingRead_[it.first] == 0)
 	it.second = (++queue_.rbegin()).base();
     }
-    
     // new message to be read by everyone
     for (auto& it : subscribersMissingRead_) {
       it.second +=1; 
     }
-    
-    
-    
+     
     mlock.unlock();
+    
     // maybe no subscribers but do anyway
     cond_.notify_all();
     
@@ -86,7 +79,7 @@
       subscribersMissingRead_[std::this_thread::get_id()] = 0;
     }
     else {
-      subscribersNextRead_[std::this_thread::get_id()] = --queue_.end();
+      subscribersNextRead_[std::this_thread::get_id()] = (++queue_.rbegin()).base();
       subscribersMissingRead_[std::this_thread::get_id()] = 1;
     }
     mlock.unlock();
@@ -95,20 +88,34 @@
   template <typename T>
   void Queue<T>::unsubscribe() {
     std::unique_lock<std::mutex> mlock(mutex_);
-    subscribersNextRead_.erase(std::this_thread::get_id());
-    // :TODO: clean elements.. eventually
+    
+    int myMsgToRead = 0; 
+    if (!someoneSlowerThanMe()) {
+       int myMsgToRead = std::max_element(subscribersMissingRead_.begin(), subscribersMissingRead_.end(), pred) -> second;
+       subscribersMissingRead_.erase(std::this_thread::get_id());
+       int otherMaxMsgToRead = 0; 
+       if (subscribersMissingRead_.size() != 0) 
+         otherMaxMsgToRead = std::max_element(subscribersMissingRead_.begin(), subscribersMissingRead_.end(), pred) -> second;
+       for (int i=0; i < (otherMaxMsgToRead - myMsgToRead); ++i)
+	 queue_.pop_front();
+    } 
+    else 
+        subscribersMissingRead_.erase(std::this_thread::get_id());
+    
+    subscribersNextRead_.erase(std::this_thread::get_id()); 
     
     mlock.unlock();
   }
   
-  bool pred(const std::pair< std::thread::id, int>& lhs, const std::pair< std::thread::id, int>& rhs) {
+  template <typename T>
+  bool Queue<T>::pred(const std::pair< std::thread::id, int>& lhs, const std::pair< std::thread::id, int>& rhs) {
     return lhs.second < rhs.second;
   }
  
 
   template <typename T>
   bool Queue<T>::someoneSlowerThanMe() {
-  //:TODO: check this one...  
+    
     int maxNoMsgToRead = std::max_element(subscribersMissingRead_.begin(), subscribersMissingRead_.end(), pred) -> second;
     
     if (maxNoMsgToRead > subscribersMissingRead_[std::this_thread::get_id()])
@@ -123,22 +130,18 @@
     
     std::unique_lock<std::mutex> mlock(queue.mutex_);
     std::cout << "Messages in the queue: \n";
-    
-    for(auto it = queue.queue_.begin(); it != queue.queue_.end(); ++it) 
-      std::cout << *it << " ";
-    std::cout << std::endl;
+    for(auto& it : queue.queue_) 
+      std::cout << it << " ";
     std::cout << std::endl;
      
-    std::cout << "Next message to be read_ \n";
-    for(auto it = queue.subscribersNextRead_.begin(); it != queue.subscribersNextRead_.end(); ++it) 
-      std::cout << it->first << " " << *(it->second) << "\n";
-    std::cout << std::endl;
+    std::cout << "Next messages to be read: \n";
+    for(auto& it : queue.subscribersNextRead_) 
+      std::cout << it.first << " " << *(it.second) << "\n";
     std::cout << std::endl;
     
-    std::cout << "Number of messages to be read \n"; 
-    for(auto it = queue.subscribersMissingRead_.begin(); it != queue.subscribersMissingRead_.end(); ++it) 
-      std::cout << it->first << " " << it->second << "\n";
-    std::cout << std::endl;
+    std::cout << "Number of messages to be read: \n"; 
+    for(auto& it : queue.subscribersMissingRead_)
+      std::cout << it.first << " " << it.second << "\n";
     std::cout << std::endl;
     
     mlock.unlock();

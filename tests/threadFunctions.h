@@ -1,7 +1,7 @@
 //   Queue - an implementation of a single producer multiple consumers 
 //           with the following constraints:
-//           - the consumers can register/deregister to the queue at run time
-//           - all the messages MUST be consumed by all the consumers
+//           - the consumers can subscribe/unsubscribe to the queue at run time
+//           - all the messages MUST be consumed by all the subscribed consumers
 //            
 //   Copyright (C) 2014 Monica Reggiani <monica.reggiani@gmail.com>
 // 
