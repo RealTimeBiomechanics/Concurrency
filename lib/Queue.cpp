@@ -127,9 +127,8 @@
   }
   
   template <typename T>
-  std::ostream& operator<<(std::ostream& os,  Queue<T>& queue) {
+  std::ostream& operator<<(std::ostream& os,  const Queue<T>& queue) {
     
-    std::unique_lock<std::mutex> mlock(queue.mutex_);
     std::cout << "Messages in the queue: \n";
     for(auto& it : queue.queue_) 
       std::cout << it << " ";
@@ -145,7 +144,6 @@
       std::cout << it.first << " " << it.second << "\n";
     std::cout << std::endl;
     
-    mlock.unlock();
     return os;
 }
   

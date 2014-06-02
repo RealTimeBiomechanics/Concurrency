@@ -25,9 +25,7 @@
 #include <chrono>
 #include <vector>
 
-
-
-
+std::mutex outputMutex;
 
 // all times in milliseconds
 void produce(Queue<int>& q, TimeT startTime, TimeT period, int noMessages) {

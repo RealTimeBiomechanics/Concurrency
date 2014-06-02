@@ -43,7 +43,7 @@ class Queue {
     void push(const T& item);
    
     template <typename B>
-    friend std::ostream& operator<< (std::ostream& os,  Queue<B>& queue);
+    friend std::ostream& operator<< (std::ostream& os,  const Queue<B>& queue);
   
   private:
     

@@ -22,7 +22,6 @@
 #include <iostream>
 #include <vector>
 
-std::mutex outputMutex;
 
 int main()
 {
@@ -55,6 +54,7 @@ int main()
   consumer2Test1.join(); 
   consumer3Test1.join(); 
   consumer4Test1.join(); 
+  
   
   std::cout << "\nFinal state of the queue: \n";
   std::cout << q1 << "\n\n"; 
