@@ -113,7 +113,7 @@ int main()
   //         Consumers 3 and 4  25 to 50 and  75 to 100
   
   std::cout << "\n ---------------- Third Test ----------------\n";
-  std::cout << "OUTPUT: Consumers 1 and 2 rapproximatively  from 1 to 25 and 75 to 100\n"; 
+  std::cout << "OUTPUT: Consumers 1 and 2 aapproximatively  from 1 to 25 and 50 to 75\n"; 
   std::cout << "        Consumers 3 and 4 approximatively from 25 to 50 and 75 to 100\n\n";
   
   
