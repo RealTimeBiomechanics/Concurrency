@@ -21,7 +21,8 @@
 
 #include "Queue.h"
 #include <iostream>
-#include <boost/iterator/iterator_concepts.hpp>
+#include <algorithm>
+//#include <boost/iterator/iterator_concepts.hpp>
 
   template <typename T>
   T Queue<T>::pop() {

@@ -20,6 +20,7 @@
 
 #include "threadFunctions.h"
 #include <iostream>
+#include <vector>
 
 std::mutex outputMutex;
 

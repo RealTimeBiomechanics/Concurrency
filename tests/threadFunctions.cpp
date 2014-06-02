@@ -18,15 +18,17 @@
 //   You should have received a copy of the GNU General Public License
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "threadFunctions.h"
 #include "Queue.h"
 #include <iostream>
 #include <thread>
-#include <chrono>  
+#include <chrono>
+#include <vector>
 
-#include "threadFunctions.h"
 
 
-typedef std::chrono::milliseconds TimeT; 
+
+
 // all times in milliseconds
 void produce(Queue<int>& q, TimeT startTime, TimeT period, int noMessages) {
   auto start = std::chrono::system_clock::now(); 
@@ -46,7 +48,7 @@ void consume(Queue<int>& q, const int id,  const std::vector<TimeT>& subscribeTi
  
   std::vector<int> consumedValues;
   bool lastMessage = false;
-  int nextConsumerPeriod = 0;
+  unsigned nextConsumerPeriod = 0;
   
   auto start = std::chrono::system_clock::now(); 
   
@@ -90,4 +92,3 @@ void consume(Queue<int>& q, const int id,  const std::vector<TimeT>& subscribeTi
   mlock.unlock();
 
 }
-

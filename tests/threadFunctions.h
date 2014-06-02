@@ -17,17 +17,24 @@
 // 
 //   You should have received a copy of the GNU General Public License
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#ifndef threadFunctions_h
+#define threadFunctions_h
 
 
 #include "Queue.h"
 #include <iostream>
 #include <thread>
 #include <chrono>  
+#include <vector>
 
 extern std::mutex outputMutex;
+
 
 typedef std::chrono::milliseconds TimeT; 
 // all times in milliseconds
 void produce(Queue<int>& q, TimeT startTime, TimeT period, int noMessages);
 
 void consume(Queue<int>& q, const int id,  const std::vector<TimeT>& subscribeTime, const std::vector<TimeT>& unsubscribeTime, TimeT readingCycleTime );
+
+
+#endif
