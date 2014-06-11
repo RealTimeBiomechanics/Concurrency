@@ -18,7 +18,7 @@ void doingNothing(Latch& l, int i, TimeT sleepingBeforeLatching) {
   std::cout << "thread " << i << " entering  the barrier at: " << (stop-start).count() << std::endl; 
   lock1.unlock();
   
-  l.arriveAndWait();
+  l.wait();
   
   stop = std::chrono::system_clock::now(); 
   std::unique_lock<std::mutex> lock2(mutexOutput);
@@ -44,4 +44,25 @@ int main()
   thread3.join(); 
   thread4.join(); 
   thread5.join(); 
+  
+  Latch l2(4);
+
+  l2.setCount(5);
+  
+  
+  std::thread thread11(std::bind(doingNothing, std::ref(l2), 1, TimeT{1000}));
+  std::thread thread12(std::bind(doingNothing, std::ref(l2), 2, TimeT{2000}));
+  std::thread thread13(std::bind(doingNothing, std::ref(l2), 3, TimeT{3000}));
+  std::thread thread14(std::bind(doingNothing, std::ref(l2), 4, TimeT{4000}));
+  std::thread thread15(std::bind(doingNothing, std::ref(l2), 5, TimeT{5000}));  
+
+ 
+  thread11.join(); 
+  thread12.join(); 
+  thread13.join(); 
+  thread14.join(); 
+  thread15.join(); 
+  
+  
+  
 }

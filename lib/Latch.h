@@ -7,9 +7,13 @@
 
 class Latch {
 public:
+  Latch();
   Latch(int count);
 
-  void arriveAndWait();
+  void setCount(int count);
+  
+  void wait();
+  
 
   Latch(const Latch&) = delete;
   Latch& operator=(const Latch&) = delete; 
