@@ -26,6 +26,4 @@ private:
 
 };
 
-#include "Latch.cpp"
-
 #endif  
