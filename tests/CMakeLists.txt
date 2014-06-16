@@ -1,1 +1,3 @@
-add_executable(latch main.cpp)
+
+add_executable(latch latchMain.cpp)
+add_executable(queue queueMain.cpp threadFunctions.cpp)
