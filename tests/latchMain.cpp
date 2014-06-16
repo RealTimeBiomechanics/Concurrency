@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-#include "Latch.h"
+#include "concurrency/Latch.h"
 
 std::mutex mutexOutput; 
 

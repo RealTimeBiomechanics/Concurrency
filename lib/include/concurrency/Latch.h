@@ -11,12 +11,12 @@ public:
   Latch(int count);
 
   void setCount(int count);
-  
+
   void wait();
-  
+
 
   Latch(const Latch&) = delete;
-  Latch& operator=(const Latch&) = delete; 
+  Latch& operator=(const Latch&) = delete;
 private:
 
   int count_;
@@ -26,4 +26,4 @@ private:
 
 };
 
-#endif  
+#endif

@@ -19,7 +19,7 @@
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "threadFunctions.h"
-#include "Queue.h"
+#include "concurrency/Queue.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
