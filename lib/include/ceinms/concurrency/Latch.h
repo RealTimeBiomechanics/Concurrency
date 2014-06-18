@@ -5,6 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 
+namespace CEINMS{ namespace Concurrency{
 class Latch {
 public:
   Latch();
@@ -25,5 +26,7 @@ private:
   std::mutex mutex_;
 
 };
+
+}; };
 
 #endif

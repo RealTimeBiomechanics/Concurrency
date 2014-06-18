@@ -22,6 +22,7 @@
 #include <iostream>
 #include <vector>
 
+using namespace CEINMS::Concurrency;
 
 int main()
 {

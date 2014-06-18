@@ -28,6 +28,7 @@
 #include <mutex>
 #include <condition_variable>
 
+namespace CEINMS{ namespace Concurrency{
 template <typename T>
 class Queue {
   public:
@@ -64,6 +65,7 @@ class Queue {
     bool someoneSlowerThanMe();
 };
 
+}; };
 #include "Queue.cpp"
 
 #endif

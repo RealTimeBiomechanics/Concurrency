@@ -1,9 +1,9 @@
 #Author: Elena Ceseracciu
 
-set(Concurrency_HEADERS include/concurrency/Latch.h
-                        include/concurrency/Queue.h)
+set(Concurrency_HEADERS include/ceinms/concurrency/Latch.h
+                        include/ceinms/concurrency/Queue.h)
 
-set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/concurrency/Queue.cpp)
+set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/ceinms/concurrency/Queue.cpp)
 set_source_files_properties(${Concurrency_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 set(Concurrency_SOURCES Latch.cpp)
@@ -18,7 +18,7 @@ set(Concurrency_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" CACHE PATH "In
 mark_as_advanced(Concurrency_INCLUDE_DIR)
 
 install(FILES ${Concurrency_HEADERS} ${Concurrency_TEMPLATE_IMPLEMENTATIONS}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/concurrency)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ceinms/concurrency)
 
 install(TARGETS Concurrency
         EXPORT ConcurrencyTargets

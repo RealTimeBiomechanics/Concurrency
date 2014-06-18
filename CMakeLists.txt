@@ -7,6 +7,9 @@ if(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11")
 endif(UNIX)
 
+set(CMAKE_DEBUG_POSTFIX "d")
+
+
 include(GNUInstallDirs)
 
 add_subdirectory(lib)
@@ -16,7 +19,6 @@ add_subdirectory(tests)
 set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/Concurrency)
 install(EXPORT ConcurrencyTargets
         FILE ConcurrencyTargets.cmake
-        NAMESPACE Concurrency::
         DESTINATION ${ConfigPackageLocation})
 
 include(CMakePackageConfigHelpers)
@@ -41,3 +43,4 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+

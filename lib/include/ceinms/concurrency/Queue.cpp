@@ -23,6 +23,7 @@
 #include <iostream>
 #include <algorithm>
 //#include <boost/iterator/iterator_concepts.hpp>
+namespace CEINMS{ namespace Concurrency{
 
   template <typename T>
   T Queue<T>::pop() {
@@ -147,4 +148,4 @@
     return os;
 }
 
-
+}; };

@@ -1,6 +1,8 @@
-#include "concurrency/Latch.h"
+#include "ceinms/concurrency/Latch.h"
 #include <iostream>
 #include <algorithm>
+
+namespace CEINMS{ namespace Concurrency{
 
 Latch::Latch() 
 :count_(0)
@@ -34,3 +36,4 @@ void Latch::wait() {
     mlock.unlock();
 }
 
+}; };

@@ -19,13 +19,15 @@
 //   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "threadFunctions.h"
-#include "concurrency/Queue.h"
+#include "ceinms/concurrency/Queue.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
 #include <vector>
 
 std::mutex outputMutex;
+
+using namespace CEINMS::Concurrency;
 
 // all times in milliseconds
 void produce(Queue<int>& q, TimeT startTime, TimeT period, int noMessages) {

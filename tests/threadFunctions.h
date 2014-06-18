@@ -21,7 +21,7 @@
 #define threadFunctions_h
 
 
-#include "concurrency/Queue.h"
+#include "ceinms/concurrency/Queue.h"
 #include <iostream>
 #include <thread>
 #include <chrono>  
@@ -32,9 +32,9 @@ extern std::mutex outputMutex;
 
 typedef std::chrono::milliseconds TimeT; 
 // all times in milliseconds
-void produce(Queue<int>& q, TimeT startTime, TimeT period, int noMessages);
+void produce(CEINMS::Concurrency::Queue<int>& q, TimeT startTime, TimeT period, int noMessages);
 
-void consume(Queue<int>& q, const int id,  const std::vector<TimeT>& subscribeTime, const std::vector<TimeT>& unsubscribeTime, TimeT readingCycleTime );
+void consume(CEINMS::Concurrency::Queue<int>& q, const int id,  const std::vector<TimeT>& subscribeTime, const std::vector<TimeT>& unsubscribeTime, TimeT readingCycleTime );
 
 
 #endif

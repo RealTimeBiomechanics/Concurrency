@@ -1,11 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-#include "concurrency/Latch.h"
+#include "ceinms/concurrency/Latch.h"
 
 std::mutex mutexOutput; 
 
 typedef std::chrono::milliseconds TimeT; 
+using namespace CEINMS::Concurrency;
 
 // all times in milliseconds
 void doingNothing(Latch& l, int i, TimeT sleepingBeforeLatching) {
