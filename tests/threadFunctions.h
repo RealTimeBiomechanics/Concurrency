@@ -21,7 +21,7 @@
 #define threadFunctions_h
 
 
-#include "ceinms/concurrency/Queue.h"
+#include "ceinms/Concurrency/Queue.h"
 #include <iostream>
 #include <thread>
 #include <chrono>  

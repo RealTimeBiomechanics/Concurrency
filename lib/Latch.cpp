@@ -1,4 +1,4 @@
-#include "ceinms/concurrency/Latch.h"
+#include "ceinms/Concurrency/Latch.h"
 #include <iostream>
 #include <algorithm>
 
