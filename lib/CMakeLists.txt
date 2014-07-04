@@ -1,7 +1,8 @@
 #Author: Elena Ceseracciu
 
 set(Concurrency_HEADERS include/ceinms/concurrency/Latch.h
-                        include/ceinms/concurrency/Queue.h)
+                        include/ceinms/concurrency/Queue.h
+                        include/ceinms/concurrency/Condition.h)
 
 set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/ceinms/concurrency/Queue.cpp)
 set_source_files_properties(${Concurrency_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
