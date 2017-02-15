@@ -12,24 +12,30 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
-#ifndef threadFunctions_h
-#define threadFunctions_h
+#ifndef rtb_Latch_h
+#define rtb_Latch_h
 
-
-#include "rtb/Concurrency/Queue.h"
-#include <iostream>
 #include <thread>
-#include <chrono>  
-#include <vector>
+#include <mutex>
+#include <condition_variable>
 
-extern std::mutex outputMutex;
+namespace rtb{
+    namespace Concurrency{
+        class Latch {
+        public:
+            Latch();
+            Latch(int count);
+            void setCount(int count);
+            void wait();
+            Latch(const Latch&) = delete;
+            Latch& operator=(const Latch&) = delete;
+        private:
+            int count_;
+            std::condition_variable condition_;
+            std::mutex mutex_;
 
-
-typedef std::chrono::milliseconds TimeT; 
-// all times in milliseconds
-void produce(rtb::Concurrency::Queue<int>& q, TimeT startTime, TimeT period, int noMessages);
-
-void consume(rtb::Concurrency::Queue<int>& q, const int id,  const std::vector<TimeT>& subscribeTime, const std::vector<TimeT>& unsubscribeTime, TimeT readingCycleTime );
-
+        };
+    }
+}
 
 #endif

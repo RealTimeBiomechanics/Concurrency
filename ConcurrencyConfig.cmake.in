@@ -1,7 +1,5 @@
 #CMake configuration file for Concurrency library
 @PACKAGE_INIT@
 
-set_and_check(Concurrency_INCLUDE_DIRS @PACKAGE_CMAKE_INSTALL_INCLUDEDIR@)
-
 include("${CMAKE_CURRENT_LIST_DIR}/ConcurrencyTargets.cmake")
 
