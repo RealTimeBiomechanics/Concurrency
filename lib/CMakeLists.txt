@@ -1,7 +1,8 @@
 #Author: Elena Ceseracciu
 
 set(Concurrency_HEADERS include/rtb/Concurrency/Latch.h
-                        include/rtb/Concurrency/Queue.h)
+                        include/rtb/Concurrency/Queue.h
+                        include/rtb/Concurrency/Concurrency.h)
 
 set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/rtb/Concurrency/Queue.cpp)
 set_source_files_properties(${Concurrency_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
