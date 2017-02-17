@@ -31,6 +31,7 @@ namespace rtb {
         template <typename T>
         class Queue {
         public:
+            typedef T type;
             Queue() = default;
             Queue(const Queue&) = delete;
             Queue& operator=(const Queue&) = delete;
