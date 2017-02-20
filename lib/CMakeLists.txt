@@ -14,6 +14,8 @@ source_group("Source files" FILES ${Concurrency_TEMPLATE_IMPLEMENTATIONS} ${Conc
 
 
 add_library(Concurrency ${Concurrency_HEADERS} ${Concurrency_TEMPLATE_IMPLEMENTATIONS} ${Concurrency_SOURCES})
+target_link_libraries(Concurrency Threads::Threads)
+
 target_include_directories(Concurrency PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)

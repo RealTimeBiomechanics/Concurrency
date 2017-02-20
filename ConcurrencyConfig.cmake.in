@@ -1,5 +1,8 @@
 #CMake configuration file for Concurrency library
 @PACKAGE_INIT@
 
+include(CMakeFindDependencyMacro)
+find_dependency(Threads)
+
 include("${CMAKE_CURRENT_LIST_DIR}/ConcurrencyTargets.cmake")
 
