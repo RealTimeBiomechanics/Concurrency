@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
-#include "rtb/Concurrency/Latch.h"
+#include "rtb/concurrency/Latch.h"
 #include <iostream>
 #include <algorithm>
 

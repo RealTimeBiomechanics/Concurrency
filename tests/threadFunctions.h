@@ -16,7 +16,7 @@
 #define threadFunctions_h
 
 
-#include "rtb/Concurrency/Queue.h"
+#include "rtb/concurrency/Queue.h"
 #include <iostream>
 #include <thread>
 #include <chrono>  

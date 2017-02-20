@@ -1,10 +1,10 @@
 #Author: Elena Ceseracciu
 
-set(Concurrency_HEADERS include/rtb/Concurrency/Latch.h
-                        include/rtb/Concurrency/Queue.h
-                        include/rtb/Concurrency/Concurrency.h)
+set(Concurrency_HEADERS include/rtb/concurrency/Latch.h
+                        include/rtb/concurrency/Queue.h
+                        include/rtb/concurrency/Concurrency.h)
 
-set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/rtb/Concurrency/Queue.cpp)
+set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/rtb/concurrency/Queue.cpp)
 set_source_files_properties(${Concurrency_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 set(Concurrency_SOURCES Latch.cpp)
@@ -20,7 +20,7 @@ target_include_directories(Concurrency PUBLIC
 
 
 install(FILES ${Concurrency_HEADERS} ${Concurrency_TEMPLATE_IMPLEMENTATIONS}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rtb/Concurrency)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rtb/concurrency)
 
 install(TARGETS Concurrency
         EXPORT ConcurrencyTargets
