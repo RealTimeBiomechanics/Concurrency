@@ -2,6 +2,7 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
+enable_language(C)
 find_dependency(Threads)
 
 include("${CMAKE_CURRENT_LIST_DIR}/ConcurrencyTargets.cmake")
