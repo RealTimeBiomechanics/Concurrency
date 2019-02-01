@@ -15,6 +15,7 @@
 #include "threadFunctions.h"
 #include <iostream>
 #include <vector>
+#include <functional>
 
 using namespace rtb::Concurrency;
 
