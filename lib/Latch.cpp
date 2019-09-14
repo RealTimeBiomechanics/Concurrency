@@ -44,6 +44,11 @@ namespace rtb{
         }
 
 
+		void Latch::increaseCount(unsigned n)
+		{
+			setCount(count_ + n);
+		}
+
         void Latch::wait() {
             std::unique_lock<std::mutex> mlock(mutex_);
             if (count_ == 0) {

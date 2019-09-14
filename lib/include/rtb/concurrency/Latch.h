@@ -26,6 +26,10 @@ namespace rtb{
             Latch();
             Latch(int count);
             void setCount(int count);
+			//increase the internal counter by `n`. This can be used
+			//when the number of threads that use this latch is determined
+			//at run time.
+			void increaseCount(unsigned n);
             void wait();
             Latch(const Latch&) = delete;
             Latch& operator=(const Latch&) = delete;
