@@ -15,6 +15,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <functional>
 #include "rtb/concurrency/Latch.h"
 
 std::mutex mutexOutput; 
