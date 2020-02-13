@@ -41,6 +41,7 @@ namespace rtb {
             void push(const T& item);
             template <typename B>
             friend std::ostream& operator<< (std::ostream& os, const Queue<B>& queue);
+            int messagesRemaining();
         private:
             // decided to go with a list so we can trust the iterator. With other containers you can have
             // reallocation that invalidates iterator

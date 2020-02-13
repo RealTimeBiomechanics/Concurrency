@@ -143,5 +143,14 @@ namespace rtb{
 
             return os;
         }
+		
+		template <typename T>
+		int Queue<T>::messagesRemaining() {
+        	// should ideally be an atomic read, but to be safe using mlock
+        	std::unique_lock<std::mutex> mlock(mutex_);
+        	int i = subscribersMissingRead_[std::this_thread::get_id()];
+        	mlock.unlock();
+        	return i;
+        }
     }
 }
