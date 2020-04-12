@@ -2,9 +2,15 @@
 
 set(Concurrency_HEADERS include/rtb/concurrency/Latch.h
                         include/rtb/concurrency/Queue.h
+                        include/rtb/concurrency/SimpleQueue.h
+                        include/rtb/concurrency/ThreadPool.h
                         include/rtb/concurrency/Concurrency.h)
 
-set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/rtb/concurrency/Queue.cpp)
+set(Concurrency_TEMPLATE_IMPLEMENTATIONS include/rtb/concurrency/Queue.cpp 
+                                         include/rtb/concurrency/SimpleQueue.cpp
+                                         include/rtb/concurrency/ThreadPool.cpp
+)
+
 set_source_files_properties(${Concurrency_TEMPLATE_IMPLEMENTATIONS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 set(Concurrency_SOURCES Latch.cpp)
