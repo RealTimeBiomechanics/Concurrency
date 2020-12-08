@@ -58,7 +58,7 @@ namespace rtb {
 
         template<typename T>
         class MessageSorter {
-            /* Message sorter reorganise the messages produced by the ThreadPool
+            /* Message sorter reorganize the messages produced by the ThreadPool
             * in the correct temporal sequence.
             */
         public:
