@@ -1,5 +1,6 @@
 #include <vector>
 #include <thread>
+#include <utility>
 
 namespace rtb {
 	namespace Concurrency {
@@ -60,7 +61,7 @@ namespace rtb {
 			latch.wait();
 			std::vector<std::thread> workersThreads;
 			for (auto& it : workers)
-				workersThreads.emplace_back(std::ref(*it), std::forward<Args...>(args));
+				workersThreads.emplace_back(std::ref(*it), std::forward<Args>(args)...);
 
 			std::thread jobCreatorThread(std::ref(jobCreator));
 			std::thread messageSorterThread(std::ref(messageSorter));
