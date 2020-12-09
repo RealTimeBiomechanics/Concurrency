@@ -1,2 +1,5 @@
+add_executable(ExampleProducerConsumer exampleProducerConsumer.cpp)
+target_link_libraries(ExampleProducerConsumer Concurrency)
+
 add_executable(ExampleThreadPool exampleThreadPool.cpp)
 target_link_libraries(ExampleThreadPool Concurrency)
