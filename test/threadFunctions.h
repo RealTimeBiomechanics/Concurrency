@@ -15,21 +15,27 @@
 #ifndef threadFunctions_h
 #define threadFunctions_h
 
-
 #include "rtb/concurrency/Queue.h"
 #include <iostream>
 #include <thread>
-#include <chrono>  
+#include <chrono>
 #include <vector>
 
 extern std::mutex outputMutex;
 
-
-typedef std::chrono::milliseconds TimeT; 
+typedef std::chrono::milliseconds TimeT;
 // all times in milliseconds
-void produce(rtb::Concurrency::Queue<int>& q, TimeT startTime, TimeT period, int noMessages);
+struct Producer {
+    void operator()(rtb::Concurrency::Queue<int> &q, TimeT startTime, TimeT period, int noMessages);
+    std::vector<int> producedValues;
+};
 
-void consume(rtb::Concurrency::Queue<int>& q, const int id,  const std::vector<TimeT>& subscribeTime, const std::vector<TimeT>& unsubscribeTime, TimeT readingCycleTime );
-
-
+struct Consumer {
+    void operator()(rtb::Concurrency::Queue<int> &q,
+        const int id,
+        const std::vector<TimeT> &subscribeTime,
+        const std::vector<TimeT> &unsubscribeTime,
+        TimeT readingCycleTime);
+    std::vector<int> consumedValues;
+};
 #endif

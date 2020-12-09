@@ -15,7 +15,6 @@
 #ifndef rtb_Queue_h
 #define rtb_Queue_h
 
-
 #include <list>
 #include <map>
 #include <thread>
@@ -23,45 +22,45 @@
 #include <condition_variable>
 
 namespace rtb {
-    namespace Concurrency{
-        //   Queue - an implementation of a single producer multiple consumers
-        //           with the following constraints:
-        //           - the consumers can subscribe/unsubscribe to the queue at run time
-        //           - all the messages MUST be consumed by all the subscribed consumers
-        template <typename T>
-        class Queue {
-        public:
-            typedef T type;
-            Queue() = default;
-            Queue(const Queue&) = delete;
-            Queue& operator=(const Queue&) = delete;
-            void subscribe();
-            void unsubscribe();
-            T pop();
-            void push(const T& item);
-            template <typename B>
-            friend std::ostream& operator<< (std::ostream& os, const Queue<B>& queue);
-        private:
-            // decided to go with a list so we can trust the iterator. With other containers you can have
-            // reallocation that invalidates iterator
-            // CP: c++11 should have introduced std::next and std::prev for iterators..
-            std::list<T> queue_;
-            typedef typename std::list<T>::iterator QueueIterator;
-            // could be a single map with a structure. But keep in this way cause it helps in function unsubscribe
-            std::map< std::thread::id, QueueIterator > subscribersNextRead_;
-            std::map< std::thread::id, int > subscribersMissingRead_;
-            std::mutex mutex_;
-            std::condition_variable cond_;
+namespace Concurrency {
+    //   Queue - an implementation of a single producer multiple consumers design pattern
+    //           with the following constraints:
+    //           - the consumers can subscribe/unsubscribe to the queue at run time
+    //           - all the messages MUST be consumed by all the subscribed consumers
+    template<typename T>
+    class Queue {
+      public:
+        typedef T type;
+        Queue() = default;
+        Queue(const Queue &) = delete;
+        Queue &operator=(const Queue &) = delete;
+        void subscribe();
+        void unsubscribe();
+        T pop();
+        void push(const T &item);
+        template<typename B>
+        friend std::ostream &operator<<(std::ostream &os, const Queue<B> &queue);
 
-            // utility function used to find the maximum on a map
-            static bool pred(const std::pair< std::thread::id, int>& lhs, const std::pair< std::thread::id, int>& rhs);
-            bool someoneSlowerThanMe();
-        };
-    }
-}
+      private:
+        // decided to go with a list so we can trust the iterator. With other containers you can
+        // have reallocation that invalidates iterator CP: c++11 should have introduced std::next
+        // and std::prev for iterators..
+        std::list<T> queue_;
+        typedef typename std::list<T>::iterator QueueIterator;
+        // could be a single map with a structure. But keep in this way cause it helps in function
+        // unsubscribe
+        std::map<std::thread::id, QueueIterator> subscribersNextRead_;
+        std::map<std::thread::id, int> subscribersMissingRead_;
+        std::mutex mutex_;
+        std::condition_variable cond_;
+
+        // utility function used to find the maximum on a map
+        static bool pred(const std::pair<std::thread::id, int> &lhs,
+            const std::pair<std::thread::id, int> &rhs);
+        bool someoneSlowerThanMe();
+    };
+}// namespace Concurrency
+}// namespace rtb
 
 #include "Queue.cpp"
 #endif
-
-
-

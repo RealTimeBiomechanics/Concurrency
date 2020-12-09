@@ -13,7 +13,6 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-
 #ifndef rtb_SimpleQueue_h
 #define rtb_SimpleQueue_h
 
@@ -23,45 +22,46 @@
 #include <condition_variable>
 
 namespace rtb {
-    namespace Concurrency {
-        /// SimpleQueue is an implementation of a producer consumer pattern 
-        /** Each message is removed from SimpleQueue after being read by any of the consumers. */
+namespace Concurrency {
+    /// SimpleQueue is an implementation of a producer consumer pattern
+    /** Each message is removed from SimpleQueue after being read by any of the consumers. */
 
-        template<typename T>
-        using IndexedData = std::tuple<unsigned long long, T>;
+    template<typename T>
+    using IndexedData = std::tuple<unsigned long long, T>;
 
-        template<typename T>
-        struct OrderByIndex
-        {
-            bool operator() (IndexedData<T> const& a, IndexedData<T> const& b) { return std::get<0>(a) > std::get<0>(b); }
-        };
+    template<typename T>
+    struct OrderByIndex {
+        bool operator()(IndexedData<T> const &a, IndexedData<T> const &b) {
+            return std::get<0>(a) > std::get<0>(b);
+        }
+    };
 
-        using IndexT = unsigned long long;
+    using IndexT = unsigned long long;
 
-        template <typename T, typename QueueType = std::queue<T>>
-        class SimpleQueue
-        {
-        public:
-            SimpleQueue() = default;
-            SimpleQueue(const SimpleQueue&) = delete;            // disable copying
-            SimpleQueue& operator=(const SimpleQueue&) = delete; // disable assignment
-            T pop();
-            size_t size();
-            void pop(T& item);
-            
-            template<typename U = T, typename Q = QueueType>
-            typename std::enable_if<std::is_same<Q, std::priority_queue<U>>::value, U>::type pop_index(IndexT idx); 
-            T front();
-            void front(T& item);
-            void push(const T& item);
+    template<typename T, typename QueueType = std::queue<T>>
+    class SimpleQueue {
+      public:
+        SimpleQueue() = default;
+        SimpleQueue(const SimpleQueue &) = delete;// disable copying
+        SimpleQueue &operator=(const SimpleQueue &) = delete;// disable assignment
+        T pop();
+        size_t size();
+        void pop(T &item);
 
-        private:
-            QueueType queue_;
-            std::mutex mutex_;
-            std::condition_variable cond_;
-        };
-    }
-}
+        template<typename U = T, typename Q = QueueType>
+        typename std::enable_if<std::is_same<Q, std::priority_queue<U>>::value, U>::type pop_index(
+            IndexT idx);
+        T front();
+        void front(T &item);
+        void push(const T &item);
+
+      private:
+        QueueType queue_;
+        std::mutex mutex_;
+        std::condition_variable cond_;
+    };
+}// namespace Concurrency
+}// namespace rtb
 
 #include "SimpleQueue.cpp"
 #endif

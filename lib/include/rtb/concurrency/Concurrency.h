@@ -18,5 +18,6 @@
 
 #include "rtb/concurrency/Latch.h"
 #include "rtb/concurrency/Queue.h"
+#include "rtb/concurrency/ThreadPool.h"
 
 #endif
