@@ -4,9 +4,8 @@ project(Concurrency)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-#should maybe check whether chosen compiler supports c++11
 if(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif(UNIX)
 
 set(CMAKE_DEBUG_POSTFIX "_d")
