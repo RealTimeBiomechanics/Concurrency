@@ -1,4 +1,5 @@
 # Concurrency
+[![Build Status](https://travis-ci.org/RealTimeBiomechanics/Concurrency.svg?branch=develop)](https://travis-ci.org/RealTimeBiomechanics/Concurrency)
 
 Concurrency is a small library to handle thread synchronization through an efficient C++11 implementation of Queues and Latches.
 
