@@ -15,7 +15,7 @@ using std::cout;
 using namespace rtb::Concurrency;
 
 // Define the queue as global variable. 
-// All the synchronization in `Queue`.
+// All the synchronization is managed in `Queue`.
 Queue<int> q;
 
 void produce(int n) {
