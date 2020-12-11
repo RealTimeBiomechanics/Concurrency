@@ -6,6 +6,12 @@ using std::cout;
 #include "rtb/concurrency/Concurrency.h"
 using namespace rtb::Concurrency;
 
+// In this example, one producer and one consumer are defined as free functions. A `Queue` is
+// defined as global variable and used as shared memory area to pass the data between the two
+// threads. The access the data internal to the `Queue` is automatically managed, is thread safe and
+// data race free. An `endToken` is defined to notify that the producer has finished producing data
+// and the consumer can gracefully close.
+
 // Define the queue as global variable
 Queue<int> q;
 constexpr int endToken = std::numeric_limits<int>::max();
@@ -20,7 +26,7 @@ void produce(int n) {
 }
 
 void consume() {
-    //Important, you always need to subscribe to the `Queue` prior reading from it
+    // Important, you always need to subscribe to the `Queue` prior reading from it
     q.subscribe();
     bool run = true;
     while (run) {
@@ -31,7 +37,7 @@ void consume() {
             run = false;
         }
     }
-    // When no consumers are subscribet to the `Queue`, data is removed from the Queue and 
+    // When no consumers are subscribet to the `Queue`, data is removed from the Queue and
     // no new data is added until a new consumer subscribes
     q.unsubscribe();
 }
