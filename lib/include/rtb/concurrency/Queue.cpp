@@ -68,7 +68,7 @@ namespace rtb{
         template<typename T>
         size_t Queue<T>::messagesToRead() const {
             std::lock_guard<std::mutex> guard{ mutex_ };
-            return subscribersMissingRead_[std::this_thread::get_id()];
+            return subscribersMissingRead_.at(std::this_thread::get_id());
         }
 
         template <typename T>
