@@ -84,7 +84,7 @@ Using Git Bash and from the Concurrency directory run the following code
 ```bash
 mkdir build
 cd build
-cmake -G "Visual Studio 16 2019" ..
+cmake -G "Visual Studio 16 2019" ..
 cmake --build . --config Release --target install
 ```
 After installation, create a Windows environment variable names `Concurrency_DIR` which points at the installation directory. This will be used to eaily import Concurrency in your own project.
