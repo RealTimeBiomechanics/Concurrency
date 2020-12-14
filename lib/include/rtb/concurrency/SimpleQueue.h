@@ -25,7 +25,6 @@ namespace rtb {
 namespace Concurrency {
     /// SimpleQueue is an implementation of a producer consumer pattern
     /** Each message is removed from SimpleQueue after being read by any of the consumers. */
-
     template<typename T>
     using IndexedData = std::tuple<unsigned long long, T>;
 
@@ -47,7 +46,11 @@ namespace Concurrency {
         T pop();
         size_t size();
         void pop(T &item);
-
+        bool valid() const;
+        // Call `invalidate` when the producer has finished producing data and it is terminating.
+        // The consumers will have to call the function `valid` to check if the stream is still
+        // valid
+        void invalidate();
         template<typename U = T, typename Q = QueueType>
         typename std::enable_if<std::is_same<Q, std::priority_queue<U>>::value, U>::type pop_index(
             IndexT idx);
@@ -57,8 +60,10 @@ namespace Concurrency {
 
       private:
         QueueType queue_;
-        std::mutex mutex_;
+        mutable std::mutex mutex_;
         std::condition_variable cond_;
+        bool isValidCache_ = true;
+        bool isValid_ = true;
     };
 }// namespace Concurrency
 }// namespace rtb

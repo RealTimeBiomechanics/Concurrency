@@ -20,6 +20,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <tuple>
 
 namespace rtb {
 namespace Concurrency {
@@ -39,21 +40,26 @@ namespace Concurrency {
         T pop();
         void push(const T &item);
         size_t messagesToRead() const;
+        bool valid() const;
+        // Call `invalidate` when the producer has finished producing data and it is terminating.
+        // The consumers will have to call the function `valid` to check if the stream is still valid
+        void invalidate();
         template<typename B>
         friend std::ostream &operator<<(std::ostream &os, const Queue<B> &queue);
 
       private:
         // decided to go with a list so we can trust the iterator. With other containers you can
-        // have reallocation that invalidates iterator 
+        // have reallocation that invalidates iterator
         std::list<T> queue_;
         typedef typename std::list<T>::iterator QueueIterator;
         // could be a single map with a structure. But keep in this way cause it helps in function
         // unsubscribe
         std::map<std::thread::id, QueueIterator> subscribersNextRead_;
         std::map<std::thread::id, int> subscribersMissingRead_;
+        std::map<std::thread::id, bool> subscriberIsValid_;
         mutable std::mutex mutex_;
         std::condition_variable cond_;
-
+        bool isValid_ = true;
         // utility function used to find the maximum on a map
         static bool pred(const std::pair<std::thread::id, int> &lhs,
             const std::pair<std::thread::id, int> &rhs);

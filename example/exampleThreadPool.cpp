@@ -20,10 +20,11 @@ struct Source {
         : outputQueue_(outputQueue) {}
     void operator()() {
         int val = 0;
-        while (true) {
+        for(int i{0}; i < 12; ++i) {
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             outputQueue_.push(val++);
         }
+        outputQueue_.invalidate();
     }
 
   private:
@@ -35,7 +36,7 @@ struct Sink {
         : inputQueue_(inputQueue) {}
     void operator()() {
         inputQueue_.subscribe();
-        while (true) {
+        while (inputQueue_.valid()) {
             std::cout << inputQueue_.pop() << std::endl;
         }
     }

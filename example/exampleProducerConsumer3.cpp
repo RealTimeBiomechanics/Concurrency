@@ -5,7 +5,6 @@ using std::endl;
 using std::cout;
 #include "rtb/concurrency/Concurrency.h"
 using namespace rtb::Concurrency;
-constexpr int endToken = std::numeric_limits<int>::max();
 
 // This example uses structs, rather than free functions, to implement producers and consumers
 
@@ -21,7 +20,7 @@ struct Producer {
             cout << "Producer (id#" << std::this_thread::get_id() << "): " << i << endl;
             outputQueue_.push(i);
         }
-        outputQueue_.push(endToken);
+        outputQueue_.invalidate();
     }
     int numberOfMessages_;
     Queue<int> &outputQueue_;
@@ -32,14 +31,9 @@ struct Consumer {
         : inputQueue_(inputQueue) {}
     void operator()() {
         inputQueue_.subscribe();
-        bool run = true;
-        while (run) {
+        while (inputQueue_.valid()) {
             int value = inputQueue_.pop();
-            if (value != endToken) {
-                cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
-            } else {
-                run = false;
-            }
+            cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
         }
         inputQueue_.unsubscribe();
     }

@@ -31,10 +31,13 @@ namespace rtb{
             // advance iterator (maybe goes to .end())
             subscribersNextRead_[std::this_thread::get_id()]++;
             subscribersMissingRead_[std::this_thread::get_id()]--;
-
+            
             if (!someoneSlowerThanMe()) {
                 queue_.pop_front();
             }
+
+            if (subscribersMissingRead_[std::this_thread::get_id()] == 0)
+                subscriberIsValid_[std::this_thread::get_id()] = isValid_;
             mlock.unlock();
             return val;
         }
@@ -66,6 +69,18 @@ namespace rtb{
         }
 
         template<typename T>
+        void Queue<T>::invalidate() {
+            std::lock_guard<std::mutex> guard{ mutex_ };
+            isValid_ = false;
+        }
+
+        template<typename T>
+        bool Queue<T>::valid() const {
+            std::lock_guard<std::mutex> guard{ mutex_ };
+            return subscriberIsValid_.at(std::this_thread::get_id());
+        }
+
+        template<typename T>
         size_t Queue<T>::messagesToRead() const {
             std::lock_guard<std::mutex> guard{ mutex_ };
             return subscribersMissingRead_.at(std::this_thread::get_id());
@@ -82,6 +97,7 @@ namespace rtb{
                 subscribersNextRead_[std::this_thread::get_id()] = (++queue_.rbegin()).base();
                 subscribersMissingRead_[std::this_thread::get_id()] = 1;
             }
+            subscriberIsValid_[std::this_thread::get_id()] = isValid_;
             mlock.unlock();
         }
 

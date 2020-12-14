@@ -6,8 +6,6 @@ using std::cout;
 #include "rtb/concurrency/Concurrency.h"
 using namespace rtb::Concurrency;
 
-constexpr int endToken = std::numeric_limits<int>::max();
-
 // Now that the queue is not defined as global variable, producer needs to know where to push the
 // data. A non-const reference is passed as function argument.
 void produce(int n, Queue<int> &q) {
@@ -16,7 +14,7 @@ void produce(int n, Queue<int> &q) {
         cout << "Producer (id#" << std::this_thread::get_id() << "): " << i << endl;
         q.push(i);
     }
-    q.push(endToken);
+    q.invalidate();
 }
 
 // Now that the queue is not defined as global variable, consumer needs to know from where to read the
@@ -25,13 +23,9 @@ void consume(Queue<int> &q) {
     // Important, you always need to subscribe to the `Queue` prior reading from it
     q.subscribe();
     bool run = true;
-    while (run) {
+    while (q.valid()) {
         int value = q.pop();
-        if (value != endToken) {
-            cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
-        } else {
-            run = false;
-        }
+        cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
     }
     // When no consumers are subscribet to the `Queue`, data is removed from the Queue and
     // no new data is added until a new consumer subscribes

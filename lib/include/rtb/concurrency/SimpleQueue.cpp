@@ -13,89 +13,90 @@
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
 
-
 namespace rtb {
-    namespace Concurrency {
+namespace Concurrency {
 
-        template <typename T, typename QueueType>
-        T SimpleQueue<T, QueueType>::pop()
-        {
-            std::unique_lock<std::mutex> mlock(mutex_);
-            while (queue_.empty())
-            {
-                cond_.wait(mlock);
-            }
-            auto val = queue_.front();
-            queue_.pop();
-            return val;
+    template<typename T, typename QueueType>
+    T SimpleQueue<T, QueueType>::pop() {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        while (queue_.empty()) {
+            cond_.wait(mlock);
         }
+        auto val = queue_.front();
+        queue_.pop();
 
-        template <typename T, typename QueueType>
-        size_t SimpleQueue<T, QueueType>::size()
-        {
-            std::unique_lock<std::mutex> mlock(mutex_);
+        if (queue_.empty()) isValid_ = isValidCache_;
 
-            return queue_.size();
-        }
-
-        template <typename T, typename QueueType>
-        void SimpleQueue<T, QueueType>::pop(T& item)
-        {
-            std::unique_lock<std::mutex> mlock(mutex_);
-            while (queue_.empty())
-            {
-                cond_.wait(mlock);
-            }
-            item = queue_.front();
-            queue_.pop();
-        }
-
-        template<typename T, typename QueueType>
-        template<typename U, typename Q>
-        typename std::enable_if<std::is_same<Q, std::priority_queue<U>>::value, U>::type
-            SimpleQueue<T, QueueType>::pop_index(IndexT idx) {
-           
-            std::unique_lock<std::mutex> mlock(mutex_);
-            while (queue_.empty() || std::get<0>(queue_.top()) != idx)
-            {
-                cond_.wait(mlock);
-            }
-            auto val = queue_.top();
-            queue_.pop();
-            return val;
-        }
-
-        template <typename T, typename QueueType>
-        T SimpleQueue<T, QueueType>::front() {
-
-            std::unique_lock<std::mutex> mlock(mutex_);
-            while (queue_.empty())
-            {
-                cond_.wait(mlock);
-            }
-            auto val = queue_.front();
-            return val;
-        }
-
-        template <typename T, typename QueueType>
-        void SimpleQueue<T, QueueType>::front(T& item)
-        {
-            std::unique_lock<std::mutex> mlock(mutex_);
-            while (queue_.empty())
-            {
-                cond_.wait(mlock);
-            }
-            item = queue_.front();
-        }
-
-        template <typename T, typename QueueType>
-        void SimpleQueue<T, QueueType>::push(const T& item)
-        {
-            std::unique_lock<std::mutex> mlock(mutex_);
-            queue_.push(item);
-            mlock.unlock();
-            cond_.notify_one();
-        }
+        return val;
     }
-}
 
+    template<typename T, typename QueueType>
+    size_t SimpleQueue<T, QueueType>::size() {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        return queue_.size();
+    }
+
+    template<typename T, typename QueueType>
+    void SimpleQueue<T, QueueType>::pop(T &item) {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        while (queue_.empty()) {
+            cond_.wait(mlock);
+        }
+        item = queue_.front();
+        queue_.pop();
+    }
+
+    template<typename T, typename QueueType>
+    template<typename U, typename Q>
+    typename std::enable_if<std::is_same<Q, std::priority_queue<U>>::value, U>::type
+        SimpleQueue<T, QueueType>::pop_index(IndexT idx) {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        while (queue_.empty() || std::get<0>(queue_.top()) != idx) {
+            cond_.wait(mlock);
+        }
+        auto val = queue_.top();
+        queue_.pop();
+        return val;
+    }
+
+    template<typename T, typename QueueType>
+    T SimpleQueue<T, QueueType>::front() {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        while (queue_.empty()) {
+            cond_.wait(mlock);
+        }
+        auto val = queue_.front();
+        return val;
+    }
+
+    template<typename T, typename QueueType>
+    void SimpleQueue<T, QueueType>::front(T &item) {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        while (queue_.empty()) {
+            cond_.wait(mlock);
+        }
+        item = queue_.front();
+    }
+
+    template<typename T, typename QueueType>
+    void SimpleQueue<T, QueueType>::push(const T &item) {
+        std::unique_lock<std::mutex> mlock(mutex_);
+        queue_.push(item);
+        mlock.unlock();
+        cond_.notify_one();
+    }
+
+    template<typename T, typename QueueType>
+    void SimpleQueue<T, QueueType>::invalidate() {
+        std::lock_guard<std::mutex> mlock(mutex_);
+        isValidCache_ = false;
+    }
+
+    template<typename T, typename QueueType>
+    bool SimpleQueue<T, QueueType>::valid() const {
+        std::lock_guard<std::mutex> mlock(mutex_);
+        return isValid_;
+    }
+
+}// namespace Concurrency
+}// namespace rtb

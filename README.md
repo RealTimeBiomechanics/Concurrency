@@ -8,39 +8,32 @@ Concurrency enables using a few lines of code to implement the Producer-Consumer
 ```cpp
 #include <thread>
 #include <iostream>
-using std::endl;
-using std::cout;
-
 #include "rtb/concurrency/Concurrency.h"
-using namespace rtb::Concurrency;
+using rtb::Concurrency::Queue;
 
-// Define the queue as global variable. 
-// All the synchronization is managed in `Queue`.
 Queue<int> q;
 
 void produce(int n) {
     for (int i{ 0 }; i < n; ++i) {
         q.push(i);
     }
+    q.invalidate();
 }
 
 void consume() {
-    q.subscribe();
-    bool run = true;
-    while (run) {
-        int value = q.pop();
-        run = (value != 9);
-    }
+   q.subscribe();
+    while (q.valid()) {
+        std::cout << q.pop() std::endl;
+     }
     q.unsubscribe();
 }
 int main() {
-    // Run `produce` function on a new thread providing a function argument
     std::thread prodThr(&produce, 10);
-    // Run `consume` function on a new thread
     std::thread consThr(&consume);
 
     prodThr.join();
     consThr.join();
+
     return 0;
 }
 ```
@@ -48,7 +41,7 @@ int main() {
 Check here for some further [examples](example).
 
 
-## Dependencies
+## Requirements
 
 * Cross-platform building: [CMake](http://www.cmake.org/) 3.1.0 or later
 * Compiler:
