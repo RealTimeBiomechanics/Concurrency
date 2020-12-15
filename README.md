@@ -17,12 +17,12 @@ void produce(int n) {
     for (int i{ 0 }; i < n; ++i) {
         q.push(i);
     }
-    q.invalidate();
+    q.close();
 }
 
 void consume() {
    q.subscribe();
-    while (q.valid()) {
+    while (q.isOpen()) {
         std::cout << q.pop() std::endl;
      }
     q.unsubscribe();

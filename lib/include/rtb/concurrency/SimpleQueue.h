@@ -46,11 +46,11 @@ namespace Concurrency {
         T pop();
         size_t size();
         void pop(T &item);
-        bool valid() const;
+        bool isOpen() const;
         // Call `invalidate` when the producer has finished producing data and it is terminating.
         // The consumers will have to call the function `valid` to check if the stream is still
         // valid
-        void invalidate();
+        void close();
         template<typename U = T, typename Q = QueueType>
         typename std::enable_if<std::is_same<Q, std::priority_queue<U>>::value, U>::type pop_index(
             IndexT idx);
@@ -62,8 +62,8 @@ namespace Concurrency {
         QueueType queue_;
         mutable std::mutex mutex_;
         std::condition_variable cond_;
-        bool isValidCache_ = true;
-        bool isValid_ = true;
+        bool isOpenCache_ = true;
+        bool isOpen_ = true;
     };
 }// namespace Concurrency
 }// namespace rtb

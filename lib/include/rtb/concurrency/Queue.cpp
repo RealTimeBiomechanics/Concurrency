@@ -37,7 +37,7 @@ namespace rtb{
             }
 
             if (subscribersMissingRead_[std::this_thread::get_id()] == 0)
-                subscriberIsValid_[std::this_thread::get_id()] = isValid_;
+                subscriberIsOpen_[std::this_thread::get_id()] = isOpen_;
             mlock.unlock();
             return val;
         }
@@ -69,15 +69,15 @@ namespace rtb{
         }
 
         template<typename T>
-        void Queue<T>::invalidate() {
+        void Queue<T>::close() {
             std::lock_guard<std::mutex> guard{ mutex_ };
-            isValid_ = false;
+            isOpen_ = false;
         }
 
         template<typename T>
-        bool Queue<T>::valid() const {
+        bool Queue<T>::isOpen() const {
             std::lock_guard<std::mutex> guard{ mutex_ };
-            return subscriberIsValid_.at(std::this_thread::get_id());
+            return subscriberIsOpen_.at(std::this_thread::get_id());
         }
 
         template<typename T>
@@ -97,7 +97,7 @@ namespace rtb{
                 subscribersNextRead_[std::this_thread::get_id()] = (++queue_.rbegin()).base();
                 subscribersMissingRead_[std::this_thread::get_id()] = 1;
             }
-            subscriberIsValid_[std::this_thread::get_id()] = isValid_;
+            subscriberIsOpen_[std::this_thread::get_id()] = isOpen_;
             mlock.unlock();
         }
 

@@ -14,7 +14,7 @@ void produce(int n, Queue<int> &q) {
         cout << "Producer (id#" << std::this_thread::get_id() << "): " << i << endl;
         q.push(i);
     }
-    q.invalidate();
+    q.close();
 }
 
 // Now that the queue is not defined as global variable, consumer needs to know from where to read the
@@ -23,7 +23,7 @@ void consume(Queue<int> &q) {
     // Important, you always need to subscribe to the `Queue` prior reading from it
     q.subscribe();
     bool run = true;
-    while (q.valid()) {
+    while (q.isOpen()) {
         int value = q.pop();
         cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
     }

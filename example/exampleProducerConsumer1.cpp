@@ -21,14 +21,14 @@ void produce(int n) {
         q.push(i);
     }
     // Notify all the consumers that no more data is going to be pushed on the queue
-    q.invalidate();
+    q.close();
 }
 
 void consume() {
     // Important, you always need to subscribe to the `Queue` prior reading from it
     q.subscribe();
     bool run = true;
-    while (q.valid()) {
+    while (q.isOpen()) {
         int value = q.pop();
         cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(20));

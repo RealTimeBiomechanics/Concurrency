@@ -20,7 +20,7 @@ struct Producer {
             cout << "Producer (id#" << std::this_thread::get_id() << "): " << i << endl;
             outputQueue_.push(i);
         }
-        outputQueue_.invalidate();
+        outputQueue_.close();
     }
     int numberOfMessages_;
     Queue<int> &outputQueue_;
@@ -31,7 +31,7 @@ struct Consumer {
         : inputQueue_(inputQueue) {}
     void operator()() {
         inputQueue_.subscribe();
-        while (inputQueue_.valid()) {
+        while (inputQueue_.isOpen()) {
             int value = inputQueue_.pop();
             cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
         }

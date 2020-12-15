@@ -40,10 +40,10 @@ namespace Concurrency {
         T pop();
         void push(const T &item);
         size_t messagesToRead() const;
-        bool valid() const;
+        bool isOpen() const;
         // Call `invalidate` when the producer has finished producing data and it is terminating.
         // The consumers will have to call the function `valid` to check if the stream is still valid
-        void invalidate();
+        void close();
         template<typename B>
         friend std::ostream &operator<<(std::ostream &os, const Queue<B> &queue);
 
@@ -56,10 +56,10 @@ namespace Concurrency {
         // unsubscribe
         std::map<std::thread::id, QueueIterator> subscribersNextRead_;
         std::map<std::thread::id, int> subscribersMissingRead_;
-        std::map<std::thread::id, bool> subscriberIsValid_;
+        std::map<std::thread::id, bool> subscriberIsOpen_;
         mutable std::mutex mutex_;
         std::condition_variable cond_;
-        bool isValid_ = true;
+        bool isOpen_ = true;
         // utility function used to find the maximum on a map
         static bool pred(const std::pair<std::thread::id, int> &lhs,
             const std::pair<std::thread::id, int> &rhs);

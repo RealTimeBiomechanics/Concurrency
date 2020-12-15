@@ -25,7 +25,7 @@ namespace Concurrency {
         auto val = queue_.front();
         queue_.pop();
 
-        if (queue_.empty()) isValid_ = isValidCache_;
+        if (queue_.empty()) isOpen_ = isOpenCache_;
 
         return val;
     }
@@ -87,15 +87,15 @@ namespace Concurrency {
     }
 
     template<typename T, typename QueueType>
-    void SimpleQueue<T, QueueType>::invalidate() {
+    void SimpleQueue<T, QueueType>::close() {
         std::lock_guard<std::mutex> mlock(mutex_);
-        isValidCache_ = false;
+        isOpenCache_ = false;
     }
 
     template<typename T, typename QueueType>
-    bool SimpleQueue<T, QueueType>::valid() const {
+    bool SimpleQueue<T, QueueType>::isOpen() const {
         std::lock_guard<std::mutex> mlock(mutex_);
-        return isValid_;
+        return isOpen_;
     }
 
 }// namespace Concurrency

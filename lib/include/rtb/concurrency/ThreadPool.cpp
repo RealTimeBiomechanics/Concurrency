@@ -84,7 +84,7 @@ namespace Concurrency {
     template<typename Funct>
     template<typename... Args>
     void Worker<Funct>::operator()(Args... args) {
-        while (inputQueue_.valid()) {
+        while (inputQueue_.isOpen()) {
             IndexedData<InputData> inData = inputQueue_.pop();
             auto functOutput = funct_(std::get<1>(inData), std::forward<Args>(args)...);
             IndexedData<OutputData> outData;
@@ -92,7 +92,7 @@ namespace Concurrency {
             std::get<1>(outData) = std::move(functOutput);
             outputQueue_.push(outData);
         }
-        outputQueue_.invalidate();
+        outputQueue_.close();
     }
 
     template<typename T>
@@ -107,15 +107,15 @@ namespace Concurrency {
     template<typename T>
     void JobsCreator<T>::operator()() {
         inputQueue_.subscribe();
-        while (inputQueue_.valid()) {
+        while (inputQueue_.isOpen()) {
             auto data{ inputQueue_.pop() };
             IndexedData<T> iData{ idx_, std::move(data) };
             outputJobsQueue_.push(iData);
             outputSequenceQueue_.push(idx_);
             ++idx_;
         }
-        outputJobsQueue_.invalidate();
-        outputSequenceQueue_.invalidate();
+        outputJobsQueue_.close();
+        outputSequenceQueue_.close();
         inputQueue_.unsubscribe();
     }
 
@@ -129,12 +129,12 @@ namespace Concurrency {
 
     template<typename T>
     void MessageSorter<T>::operator()() {
-        while (inputSequence_.valid()) {
+        while (inputSequence_.isOpen()) {
             IndexT idx{ inputSequence_.pop() };
             auto data{ inputFromThreadPool_.pop_index(idx) };
             outputQueue_.push(std::get<1>(data));
         }
-        outputQueue_.invalidate();
+        outputQueue_.close();
     }
 
 }// namespace Concurrency

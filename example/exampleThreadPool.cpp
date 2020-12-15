@@ -3,7 +3,7 @@
 #include "rtb/concurrency/ThreadPool.h"
 #include <chrono>
 #include <iostream>
-#include <type_traits>
+#include <random>
 
 using namespace rtb::Concurrency;
 struct AddOne {
@@ -11,6 +11,8 @@ struct AddOne {
     using OutputData = int;
     int operator()(int value) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::cout << "Worker (#" << std::this_thread::get_id() << "): processing value " << value
+                  << std::endl;
         return value + 1;
     }
 };
@@ -24,7 +26,7 @@ struct Source {
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             outputQueue_.push(val++);
         }
-        outputQueue_.invalidate();
+        outputQueue_.close();
     }
 
   private:
@@ -36,7 +38,7 @@ struct Sink {
         : inputQueue_(inputQueue) {}
     void operator()() {
         inputQueue_.subscribe();
-        while (inputQueue_.valid()) {
+        while (inputQueue_.isOpen()) {
             std::cout << inputQueue_.pop() << std::endl;
         }
     }
