@@ -21,12 +21,15 @@ void produce(int n) {
 }
 
 void consume() {
-   q.subscribe();
-    while (q.isOpen()) {
-        std::cout << q.pop() std::endl;
-     }
+	q.subscribe();
+	while (true) {
+		auto val = q.pop();
+		if (!val.has_value()) break;
+		cout << val.value() << endl;
+    }
     q.unsubscribe();
 }
+
 int main() {
     std::thread prodThr(&produce, 10);
     std::thread consThr(&consume);
