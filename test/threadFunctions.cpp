@@ -60,7 +60,7 @@ void Consumer::operator()(Queue<int> &q,
 
         do {
             std::this_thread::sleep_for(readingCycleTime);
-            auto item = q.pop();
+            auto item = q.pop().value();
             lastMessage = (item == std::numeric_limits<int>::max());
             if (!lastMessage) consumedValues.push_back(item);
 

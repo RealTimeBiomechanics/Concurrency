@@ -211,7 +211,6 @@ int test3() {
     consumer2Thr.join();
     consumer3Thr.join();
     consumer4Thr.join();
-    std::cout << q;
     // Assess whether the re-subscription was sucessful
     bool success = cons1.consumedValues.size() > 40;
     success &= cons2.consumedValues.size() > 40;

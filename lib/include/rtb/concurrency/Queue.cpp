@@ -126,24 +126,5 @@ namespace Concurrency {
         return false;
     }
 
-    template<typename T>
-    std::ostream &operator<<(std::ostream &os, const Queue<T> &queue) {
-        std::cout << "Messages in the queue: \n";
-        for (auto &it : queue.queue_)
-            std::cout << it << " ";
-        std::cout << std::endl;
-
-        std::cout << "Next messages to be read: \n";
-        for (auto &it : queue.subscribersNextRead_)
-            std::cout << it.first << " " << *(it.second) << "\n";
-        std::cout << std::endl;
-
-        std::cout << "Number of messages to be read: \n";
-        for (auto &it : queue.subscribersMissingRead_)
-            std::cout << it.first << " " << it.second << "\n";
-        std::cout << std::endl;
-
-        return os;
-    }
 }// namespace Concurrency
 }// namespace rtb

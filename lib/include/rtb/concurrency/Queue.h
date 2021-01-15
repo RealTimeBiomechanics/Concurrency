@@ -43,8 +43,6 @@ namespace Concurrency {
         size_t messagesToRead() const;
         // Call `close` when the producer has finished producing data and it is terminating.
         void close();
-        template<typename B>
-        friend std::ostream &operator<<(std::ostream &os, const Queue<B> &queue);
 
       private:
  
