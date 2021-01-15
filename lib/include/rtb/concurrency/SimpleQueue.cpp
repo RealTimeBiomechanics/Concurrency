@@ -32,7 +32,7 @@ namespace Concurrency {
         template<typename T, typename QueueType>
     std::optional<T> SimpleQueue<T, QueueType>::front() {
         std::unique_lock<std::mutex> mlock(mutex_);
-        while (queue_.empty() && isOpen_) {
+        while (queue_.empty()) {
             cond_.wait(mlock);
         }
         auto val{ queue_.front() };
