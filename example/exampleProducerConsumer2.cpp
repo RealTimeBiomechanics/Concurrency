@@ -23,9 +23,7 @@ void produce(int n, Queue<int> &q) {
 void consume(Queue<int> &q) {
     // Important, you always need to subscribe to the `Queue` prior reading from it
     q.subscribe();
-    while (true) {
-        auto value = q.pop();
-        if (!value.has_value()) break;
+    while (auto value{ q.pop() }) {
         cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value.value() << endl;
     }
     // When no consumers are subscribet to the `Queue`, data is removed from the Queue and

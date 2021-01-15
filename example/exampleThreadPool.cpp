@@ -43,9 +43,7 @@ struct Sink {
         : inputQueue_(inputQueue) {}
     void operator()() {
         inputQueue_.subscribe();
-        while (true) {
-            auto val{ inputQueue_.pop() };
-            if (!val.has_value()) break;
+        while (auto val{ inputQueue_.pop()}) {
             data_.push_back(val.value());
             std::cout << "Sink: " << val.value() << std::endl;
         }

@@ -22,9 +22,7 @@ void produce(int n) {
 
 void consume() {
 	q.subscribe();
-	while (true) {
-		auto val = q.pop();
-		if (!val.has_value()) break;
+	while (auto val{q.pop()}) {
 		cout << val.value() << endl;
     }
     q.unsubscribe();

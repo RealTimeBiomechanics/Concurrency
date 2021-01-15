@@ -92,10 +92,7 @@ namespace Concurrency {
     template<typename... Args>
     void Worker<Funct>::operator()(Args... args) {
         latch_.wait();
-        decltype(inputQueue_.pop()) inData;
-        while(true) {
-            inData = inputQueue_.pop();
-            if (!inData.has_value()) break;
+      while (auto inData{ inputQueue_.pop() }) {
             auto functOutput = funct_(std::get<1>(inData.value()), std::forward<Args>(args)...);
             IndexedData<OutputData> outData;
             std::get<0>(outData) = std::get<0>(inData.value());
@@ -122,9 +119,7 @@ namespace Concurrency {
     void JobsCreator<T>::operator()() {
         inputQueue_.subscribe();
         latch_.wait();
-        while (true) {
-            auto data{ inputQueue_.pop() };
-            if (!data.has_value()) break;
+        while (auto data{ inputQueue_.pop() }) {
             IndexedData<T> iData{ idx_, std::move(data.value()) };
             outputJobsQueue_.push(iData);
             outputSequenceQueue_.push(idx_);
@@ -149,9 +144,7 @@ namespace Concurrency {
     template<typename T>
     void MessageSorter<T>::operator()() {
         latch_.wait();
-        while (true) {
-            auto inputSequenceResult{ inputSequence_.pop() };
-            if (!inputSequenceResult.has_value()) break;
+        while (auto inputSequenceResult{ inputSequence_.pop() }) {
             IndexT idx{ inputSequenceResult.value() };
             auto val{ inputFromThreadPool_.popIndex(idx) };
             if (val.has_value()) { outputQueue_.push(std::get<1>(val.value())); }

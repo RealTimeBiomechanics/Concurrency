@@ -31,9 +31,7 @@ struct Consumer {
         : inputQueue_(inputQueue) {}
     void operator()() {
         inputQueue_.subscribe();
-        while (true) {
-            auto value = inputQueue_.pop();
-            if (!value.has_value()) break;
+        while (auto value{ inputQueue_.pop() }) {
             cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value.value() << endl;
         }
         inputQueue_.unsubscribe();

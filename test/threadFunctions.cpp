@@ -69,9 +69,7 @@ void Consumer::operator()(Queue<int> &q,
                     <= std::chrono::duration_cast<TimeT>(std::chrono::system_clock::now() - start));
 
         } while (!lastMessage && !timeToUnsubscribe);
-        // std::cout << "BEFORE:\n" << q << std::endl;
         q.unsubscribe();
-        //  std::cout << "AFTER:\n" << q << std::endl;
         nextConsumerPeriod++;
         if (nextConsumerPeriod < subscribeTime.size()) {
             std::this_thread::sleep_for(
