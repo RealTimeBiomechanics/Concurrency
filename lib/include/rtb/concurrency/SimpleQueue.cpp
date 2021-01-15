@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
+#include <numeric>
 
 namespace rtb {
 namespace Concurrency {
@@ -53,8 +54,9 @@ namespace Concurrency {
         std::optional<T>>::type
         SimpleQueue<T, QueueType>::popIndex(IndexT idx) {
         std::unique_lock<std::mutex> mlock(mutex_);
-     
-        while (queue_.empty() || std::get<0>(queue_.top().value_or(std::make_tuple<unsigned long long, double>(99,0.)))
+        auto defaultValue = std::make_tuple<unsigned long long, double>(
+            std::numeric_limits<unsigned long long>::max(), 0.);
+        while (queue_.empty() || std::get<0>(queue_.top().value_or(defaultValue))
                     != idx) {
             cond_.wait(mlock);
         }
