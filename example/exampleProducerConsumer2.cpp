@@ -17,15 +17,16 @@ void produce(int n, Queue<int> &q) {
     q.close();
 }
 
-// Now that the queue is not defined as global variable, consumer needs to know from where to read the
-// data. A non-const reference is passed as function argument, as data is removed from the queue after reading
+// Now that the queue is not defined as global variable, consumer needs to know from where to read
+// the data. A non-const reference is passed as function argument, as data is removed from the queue
+// after reading
 void consume(Queue<int> &q) {
     // Important, you always need to subscribe to the `Queue` prior reading from it
     q.subscribe();
-    bool run = true;
-    while (q.isOpen()) {
-        int value = q.pop();
-        cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
+    while (true) {
+        auto value = q.pop();
+        if (!value.has_value()) break;
+        cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value.value() << endl;
     }
     // When no consumers are subscribet to the `Queue`, data is removed from the Queue and
     // no new data is added until a new consumer subscribes

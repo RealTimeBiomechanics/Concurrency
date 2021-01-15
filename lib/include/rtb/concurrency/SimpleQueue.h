@@ -20,6 +20,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <optional>
 
 namespace rtb {
 namespace Concurrency {
@@ -30,40 +31,59 @@ namespace Concurrency {
 
     template<typename T>
     struct OrderByIndex {
-        bool operator()(IndexedData<T> const &a, IndexedData<T> const &b) {
-            return std::get<0>(a) > std::get<0>(b);
+    bool operator()(T const &a, T const &b) {
+            if (!a.has_value()) return 1;
+            if (!b.has_value()) return 0;
+            return std::get<0>(a.value()) > std::get<0>(b.value());
         }
+
     };
 
     using IndexT = unsigned long long;
 
-    template<typename T, typename QueueType = std::queue<T>>
+    template<typename T, typename QueueType = std::queue<std::optional<T>>>
+    class SimpleQueue;
+
+    using IndexQueue = SimpleQueue<IndexT>;
+
+    template<typename T>
+    using IndexedDataQueue = SimpleQueue<IndexedData<T>>;
+
+    template<typename T>
+    using PriorityQueue = std::priority_queue<std::optional<T>, std::vector<std::optional<T>>, OrderByIndex<std::optional<T>>>;
+
+    template<typename T>
+    using IndexedPriorityQueue = std::priority_queue < std::optional<IndexedData<T>>,
+        std::vector<std::optional<IndexedData<T>>>,
+        OrderByIndex<std::optional<IndexedData<T>>>>;
+
+
+    template<typename T>
+    using SortedIndexedDataQueue = SimpleQueue<IndexedData<T>, IndexedPriorityQueue<T>>;
+
+
+    template<typename T, typename QueueType>
     class SimpleQueue {
       public:
+
         SimpleQueue() = default;
         SimpleQueue(const SimpleQueue &) = delete;// disable copying
         SimpleQueue &operator=(const SimpleQueue &) = delete;// disable assignment
-        T pop();
+        std::optional<T> pop();
         size_t size();
-        void pop(T &item);
-        bool isOpen() const;
-        // Call `invalidate` when the producer has finished producing data and it is terminating.
-        // The consumers will have to call the function `valid` to check if the stream is still
-        // valid
         void close();
         template<typename U = T, typename Q = QueueType>
-        typename std::enable_if<std::is_same<Q, std::priority_queue<U>>::value, U>::type pop_index(
-            IndexT idx);
-        T front();
-        void front(T &item);
+        typename std::enable_if<std::is_same<Q, PriorityQueue<U>>::value,
+            std::optional<T>>::type
+            popIndex(IndexT idx);
+        std::optional<T> front();
         void push(const T &item);
 
       private:
+        void push(const std::optional<T> &item);
         QueueType queue_;
         mutable std::mutex mutex_;
         std::condition_variable cond_;
-        bool isOpenCache_ = true;
-        bool isOpen_ = true;
     };
 }// namespace Concurrency
 }// namespace rtb

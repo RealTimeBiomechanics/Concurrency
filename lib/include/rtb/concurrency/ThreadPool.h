@@ -21,18 +21,11 @@
 #include <queue>
 #include <tuple>
 #include <memory>
+#include <variant>
 
 namespace rtb {
 
 namespace Concurrency {
-
-    using IndexQueue = SimpleQueue<IndexT>;
-
-    template<typename T>
-    using IndexedDataQueue = SimpleQueue<IndexedData<T>>;
-
-    template<typename T>
-    using SortedIndexedDataQueue = SimpleQueue<IndexedData<T>, std::priority_queue<IndexedData<T>>>;
 
     template<typename T>
     class JobsCreator {
@@ -46,7 +39,9 @@ namespace Concurrency {
         JobsCreator(JobsCreator &) = delete;
         JobsCreator(Queue<T> &inputQueue,
             IndexedDataQueue<T> &outputJobsQueue,
-            IndexQueue &outputSequenceQueue);
+            IndexQueue &outputSequenceQueue,
+            Latch & latch,
+            unsigned numberOfWorkers);
         void operator()();
 
       private:
@@ -54,6 +49,8 @@ namespace Concurrency {
         IndexedDataQueue<T> &outputJobsQueue_;
         IndexQueue &outputSequenceQueue_;
         IndexT idx_;
+        Latch &latch_;
+        unsigned numberOfWorkers_;
     };
 
     template<typename T>
@@ -65,13 +62,15 @@ namespace Concurrency {
         MessageSorter() = delete;
         MessageSorter(SortedIndexedDataQueue<T> &inputFromThreadPool,
             IndexQueue &inputSequence,
-            Queue<T> &outputQueue);
+            Queue<T> &outputQueue,
+            Latch& latch);
         void operator()();
 
       private:
         SortedIndexedDataQueue<T> &inputFromThreadPool_;
         IndexQueue &inputSequence_;
         Queue<T> &outputQueue_;
+        Latch &latch_;
     };
 
     template<typename Funct>
@@ -81,13 +80,14 @@ namespace Concurrency {
         using OutputData = typename Funct::OutputData;
         using InputQueue = IndexedDataQueue<InputData>;
         using OutputQueue = SortedIndexedDataQueue<OutputData>;
-        Worker(InputQueue &inputQueue, OutputQueue &outputQueue, Funct funct);
+        Worker(InputQueue &inputQueue, OutputQueue &outputQueue, Latch& latch, Funct funct);
         template<typename... Args>
         void operator()(Args... args);
 
       private:
         InputQueue &inputQueue_;
         OutputQueue &outputQueue_;
+        Latch &latch_;
         Funct funct_;
     };
 

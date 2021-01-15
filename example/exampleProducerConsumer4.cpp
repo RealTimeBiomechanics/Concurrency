@@ -18,11 +18,11 @@ struct Producer {
     void operator()() {
         // wait on the latch until all other threads get to the latch
         cout << "Producer (id#" << std::this_thread::get_id() << "): "
-             << " latch waiting" << endl;
+             << "latch waiting" << endl;
         latch_.wait();
         cout << "Producer (id#" << std::this_thread::get_id() << "): "
-             << " latch released" << endl;
-        
+             << "latch released" << endl;
+
         for (int i{ 0 }; i < numberOfMessages_; ++i) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             cout << "Producer (id#" << std::this_thread::get_id() << "): " << i << endl;
@@ -41,20 +41,20 @@ struct Consumer {
         , latch_(latch) {}
     void operator()() {
         inputQueue_.subscribe();
-        bool run = true;
         // perform some complex initialisation. We simulate that with a sleep function.
         std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         // This thread will wait on the latch until all other threads also reach the `Latch`.
         // In this particular situation, this is likely the last thread to reach the `Latch`, thus
         // unlocking all other threads currently waiting on the `Latch`
         cout << "Consumer (id#" << std::this_thread::get_id() << "): "
-             << " latch waiting" << endl;
+             << "latch waiting" << endl;
         latch_.wait();
         cout << "Consumer (id#" << std::this_thread::get_id() << "): "
-             << " latch released" << endl;
-        while (inputQueue_.isOpen()) {
-            int value = inputQueue_.pop();
-            cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value << endl;
+             << "latch released" << endl;
+        while (true) {
+            auto value = inputQueue_.pop();
+            if (!value.has_value()) break;
+            cout << "Consumer (id#" << std::this_thread::get_id() << "): " << value.value() << endl;
         }
         inputQueue_.unsubscribe();
     }

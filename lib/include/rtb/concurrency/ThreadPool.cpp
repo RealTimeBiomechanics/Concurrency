@@ -21,13 +21,14 @@ namespace Concurrency {
         IndexedDataQueue<InputData> jobsQueue;
         SortedIndexedDataQueue<InputData> processedJobsQueue;
         SimpleQueue<IndexT> sequenceQueue;
-
-        JobsCreator<InputData> jobCreator(inputQueue_, jobsQueue, sequenceQueue);
-        MessageSorter<OutputData> messageSorter(processedJobsQueue, sequenceQueue, outputQueue_);
+        Latch internalLatch(numberOfWorkers_ + 3);
+        JobsCreator<InputData> jobCreator(inputQueue_, jobsQueue, sequenceQueue, internalLatch, numberOfWorkers_);
+        MessageSorter<OutputData> messageSorter(
+            processedJobsQueue, sequenceQueue, outputQueue_, internalLatch);
         std::vector<std::shared_ptr<Worker<Funct>>> workers;
         for (unsigned i(0); i < numberOfWorkers_; ++i) {
             workers.emplace_back(
-                std::make_shared<Worker<Funct>>(jobsQueue, processedJobsQueue, funct));
+                std::make_shared<Worker<Funct>>(jobsQueue, processedJobsQueue, internalLatch, funct));
         }
 
         std::vector<std::thread> workersThreads;
@@ -36,7 +37,7 @@ namespace Concurrency {
 
         std::thread jobCreatorThread(std::ref(jobCreator));
         std::thread messageSorterThread(std::ref(messageSorter));
-
+        internalLatch.wait();
         for (auto &it : workersThreads)
             it.join();
 
@@ -52,12 +53,14 @@ namespace Concurrency {
         SortedIndexedDataQueue<InputData> processedJobsQueue;
         SimpleQueue<IndexT> sequenceQueue;
 
-        JobsCreator<InputData> jobCreator(inputQueue_, jobsQueue, sequenceQueue);
-        MessageSorter<OutputData> messageSorter(processedJobsQueue, sequenceQueue, outputQueue_);
+        Latch internalLatch(numberOfWorkers_+3);
+        JobsCreator<InputData> jobCreator(inputQueue_, jobsQueue, sequenceQueue, internalLatch, numberOfWorkers_);
+        MessageSorter<OutputData> messageSorter(
+            processedJobsQueue, sequenceQueue, outputQueue_, internalLatch);
         std::vector<std::shared_ptr<Worker<Funct>>> workers;
         for (unsigned i(0); i < numberOfWorkers_; ++i) {
-            workers.emplace_back(
-                std::make_shared<Worker<Funct>>(jobsQueue, processedJobsQueue, funct));
+            workers.emplace_back(std::make_shared<Worker<Funct>>(
+                jobsQueue, processedJobsQueue, internalLatch, funct));
         }
 
         latch.wait();
@@ -67,7 +70,7 @@ namespace Concurrency {
 
         std::thread jobCreatorThread(std::ref(jobCreator));
         std::thread messageSorterThread(std::ref(messageSorter));
-
+        internalLatch.wait();
         for (auto &it : workersThreads)
             it.join();
 
@@ -76,19 +79,26 @@ namespace Concurrency {
     }
 
     template<typename Funct>
-    Worker<Funct>::Worker(InputQueue &inputQueue, OutputQueue &outputQueue, Funct funct)
+    Worker<Funct>::Worker(InputQueue &inputQueue,
+        OutputQueue &outputQueue,
+        Latch &latch,
+        Funct funct)
         : inputQueue_(inputQueue)
         , outputQueue_(outputQueue)
+        , latch_(latch)
         , funct_(funct) {}
 
     template<typename Funct>
     template<typename... Args>
     void Worker<Funct>::operator()(Args... args) {
-        while (inputQueue_.isOpen()) {
-            IndexedData<InputData> inData = inputQueue_.pop();
-            auto functOutput = funct_(std::get<1>(inData), std::forward<Args>(args)...);
+        latch_.wait();
+        decltype(inputQueue_.pop()) inData;
+        while(true) {
+            inData = inputQueue_.pop();
+            if (!inData.has_value()) break;
+            auto functOutput = funct_(std::get<1>(inData.value()), std::forward<Args>(args)...);
             IndexedData<OutputData> outData;
-            std::get<0>(outData) = std::move(std::get<0>(inData));
+            std::get<0>(outData) = std::get<0>(inData.value());
             std::get<1>(outData) = std::move(functOutput);
             outputQueue_.push(outData);
         }
@@ -98,23 +108,30 @@ namespace Concurrency {
     template<typename T>
     JobsCreator<T>::JobsCreator(Queue<T> &inputQueue,
         IndexedDataQueue<T> &outputJobsQueue,
-        IndexQueue &outputSequenceQueue)
+        IndexQueue &outputSequenceQueue,
+        Latch &latch,
+        unsigned numberOfWorkers)
         : inputQueue_(inputQueue)
         , outputJobsQueue_(outputJobsQueue)
         , outputSequenceQueue_(outputSequenceQueue)
-        , idx_(0) {}
+        , latch_(latch)
+        , idx_(0)
+        , numberOfWorkers_(numberOfWorkers) {}
 
     template<typename T>
     void JobsCreator<T>::operator()() {
         inputQueue_.subscribe();
-        while (inputQueue_.isOpen()) {
+        latch_.wait();
+        while (true) {
             auto data{ inputQueue_.pop() };
-            IndexedData<T> iData{ idx_, std::move(data) };
+            if (!data.has_value()) break;
+            IndexedData<T> iData{ idx_, std::move(data.value()) };
             outputJobsQueue_.push(iData);
             outputSequenceQueue_.push(idx_);
             ++idx_;
         }
-        outputJobsQueue_.close();
+        for (unsigned i(0); i < numberOfWorkers_; ++i)
+            outputJobsQueue_.close();
         outputSequenceQueue_.close();
         inputQueue_.unsubscribe();
     }
@@ -122,17 +139,22 @@ namespace Concurrency {
     template<typename T>
     MessageSorter<T>::MessageSorter(SortedIndexedDataQueue<T> &inputFromThreadPool,
         IndexQueue &inputSequence,
-        Queue<T> &outputQueue)
+        Queue<T> &outputQueue,
+        Latch &latch)
         : inputFromThreadPool_(inputFromThreadPool)
         , inputSequence_(inputSequence)
-        , outputQueue_(outputQueue) {}
+        , outputQueue_(outputQueue)
+        , latch_(latch) {}
 
     template<typename T>
     void MessageSorter<T>::operator()() {
-        while (inputSequence_.isOpen()) {
-            IndexT idx{ inputSequence_.pop() };
-            auto data{ inputFromThreadPool_.pop_index(idx) };
-            outputQueue_.push(std::get<1>(data));
+        latch_.wait();
+        while (true) {
+            auto inputSequenceResult{ inputSequence_.pop() };
+            if (!inputSequenceResult.has_value()) break;
+            IndexT idx{ inputSequenceResult.value() };
+            auto val{ inputFromThreadPool_.popIndex(idx) };
+            if (val.has_value()) { outputQueue_.push(std::get<1>(val.value())); }
         }
         outputQueue_.close();
     }
