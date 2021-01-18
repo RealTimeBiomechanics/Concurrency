@@ -21,9 +21,9 @@ void produce(int n) {
 }
 
 void consume() {
-	q.subscribe();
-	while (auto val{q.pop()}) {
-		cout << val.value() << endl;
+    q.subscribe();
+    while (auto val{q.pop()}) {
+        cout << val.value() << endl;
     }
     q.unsubscribe();
 }
