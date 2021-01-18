@@ -1,8 +1,8 @@
 ﻿# Concurrency
 [![Build Status](https://travis-ci.org/RealTimeBiomechanics/Concurrency.svg?branch=develop)](https://travis-ci.org/RealTimeBiomechanics/Concurrency)
 
-Concurrency is a lightweight portable library to handle thread synchronization through an efficient C++14 implementation of Queues and Latches. 
-Concurrency enables using a few lines of code to implement the Producer-Consumer and Publisher-Subsribers problems. 
+Concurrency is a lightweight portable library to handle thread synchronization through an efficient C++17 implementation of Queues and Latches. 
+Concurrency enables using a few lines of code to implement the Producer-Consumer and Publisher-Subscribers problems. 
 
 ## Example Publisher Subscriber
 ```cpp
