@@ -27,6 +27,55 @@ Please refer to [official CMake documentation](https://cmake.org/runningcmake/) 
 configure and build this library on the operating system and with the compiler/build environment that you are using.
 
 
+## Example Producer Consumer
+
+```c++
+#include <thread>
+#include <iostream>
+#include "rtb/concurrency/Concurrency.h"
+
+using rtb::Concurrency::Queue;
+using rtb::Concurrency::Latch;
+
+Queue<int> q;
+Latch latch(2); // Create a latch that will synchronize two threads
+
+void produce(int n) {
+
+    latch.wait(); // Block until shared latch lets it through
+
+    for (int i = n-1; i >= 0; i--) {
+        q.push(i);
+    }
+}
+
+void consume() {
+
+    q.subscribe();
+
+    latch.wait();
+
+    int val;
+    do {
+        val = q.pop();
+        std::cout << val << std::endl;
+    } while (val > 0);
+
+    q.unsubscribe();
+}
+
+int main() {
+
+    std::thread thread_produce(&produce, 10);
+    std::thread thread_consume(&consume);
+
+    thread_produce.join();
+    thread_consume.join();
+
+    return 0;
+}
+```
+
 ## License
 
 Please see the file called LICENSE.txt.
